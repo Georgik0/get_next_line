@@ -15,25 +15,25 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-# define BUFFER_SIZE 10
-
 typedef struct		s_list
 {
 	int				descriptor;
 	char			*buf;
-	char			test[BUFFER_SIZE];
+	int				eof_flag;
 	char			*reminfer;
-	int				position_save;
+	// char			*temp_list;
 	void			*next;
 
 }					t_list;
 
 
 int			get_next_line(int fd, char **line);
-char		*ft_strjoin_gnl(char const *s1, char const *s2);
+char		*ft_strjoin_gnl(char *s1, char *s2);
 size_t		ft_strlcpy(char *dst, const char *src, size_t size);
 char		*ft_strchr(const char *str, int ch);
 char		*ft_calloc(size_t count, size_t size);
 char		*ft_substr_gnl(char *buf);
+void		delete_list(t_list *list_open, t_list *start_list);
+int			check_reminder(t_list *list_open, t_list *start_list, char **line);
 
 #endif

@@ -20,16 +20,25 @@ t_list	*search_fd(t_list *start, int descriptor)
 			return (NULL);
 		start->descriptor = descriptor;
 		start->next = NULL;
+		if (!(start->reminfer = (char *)ft_calloc(1, 1)))
+		{
+			free(start);
+			return (NULL);
+		}
+		start->eof_flag = 1;
 		return (start);
 	}
 	while (descriptor != start->descriptor)
 	{
-		if (start = start->next == NULL)
+		if ((start = start->next) == NULL)
 		{
 			if (!(start = (t_list *)malloc(sizeof(t_list))))
 				return (NULL);
 			start->next = NULL;
 			start->descriptor = descriptor;
+			if (!(start->reminfer = ft_calloc(1, 1)))
+				return (NULL);
+			start->eof_flag = 1;
 			return (start);
 		}
 		if (start->descriptor == descriptor)
@@ -38,36 +47,16 @@ t_list	*search_fd(t_list *start, int descriptor)
 	return (start);
 }
 
-void		delete_list_element(t_buffer)
-{
-
-}
-
-char		*check_reminder(char *reminder, char *line, int size_reminder)
-{
-	char	*out;
-	char	*start_reminder;
-
-	if (!(out = ft_strchr(reminder, '\n'))) // если не нашли, то копируем остаток в *line
-		ft_strlcpy(line, out, size_reminder + 1);
-	else // если нашли, то скопировали в line и перезаписали reminder, предварительно заменив '\n' на '\0'
-	{
-		*(--out) = '\0';
-		ft_strlcpy(line, out, size_reminder + 1);
-	}
-}
-
 int		get_next_line(int fd, char **line)
 {
 	static t_list		*start_list;
 	t_list				*list_open;
 	char				*temp;
-	int					get_read;
-	int					i;
+	int					check_out;
+	// int					get_read;
 
 	if (!line || fd < 0 || BUFFER_SIZE <= 0)
 		return (-1);
-
 	if (start_list == NULL) // значит лист пуст, нужно создать первый элемент
 	{
 		if (!(start_list = search_fd(NULL, fd)))
@@ -81,115 +70,64 @@ int		get_next_line(int fd, char **line)
 	}
 	if (!(list_open->buf = (char *)ft_calloc(1 + BUFFER_SIZE, sizeof(char))))
 	{
-		// чистим лист
+		delete_list(list_open, start_list);
 		return (-1);
 	}
-	i = 0;
-
-	while (1)
+	if (!(*line = ft_calloc(1, 1)))
 	{
-		if (list_open->buf[i] == '\0')
-		{
-			if (!(temp = ft_substr_gnl(list_open->buf)))
-			{
-				// чистка
-				return (-1);
-			}
-			if (i != BUFFER_SIZE)
-			{
-				if (!(*line = ft_strjoin_gnl(temp, list_open->buf)))
-				{
-					// чистка
-					return (-1); // an error happened
-				}
-				else
-				{
-					// чистка
-					return (0); // EOF has benn read
-				}
-			}
-			else
-			{
-				if (!(*line = ft_strjoin_gnl(temp, list_open->buf)))
-				{
-					// чистка
-					return (-1); // an error happened
-				}
-				else
-				{
-					i = 0;
-					free(list_open->buf);
-					list_open->buf = NULL;
-					if (!(list_open->buf = (char *)ft_calloc(1 + BUFFER_SIZE, sizeof(char))))
-					{
-						// чистка
-						return (-1); // an error happened
-					}
-					if (read(fd, list_open->buf, BUFFER_SIZE) == -1)
-					{
-						// чистка
-						return (-1); // an error happened
-					}
-				}
-			}
-		}
-		if (list_open->buf[i] == '\n')
-		{
-			list_open->buf[i] = '\0';
-			if (!(temp = ft_substr_gnl(list_open->buf)))
-			{
-				// чистка
-				return (-1);
-			}
-			if (!(*line = ft_strjoin_gnl(temp, list_open->buf)))
-			{
-				// чистка
-				return (-1); // an error happened
-			}
-			if (!(ft_strlcpy(list_open->reminfer, list_open->buf + i, BUFFER_SIZE)))
-			{
-				// чистка
-				return (-1); // an error happened
-			}
-		}
-		free(temp);
+		delete_list(list_open, start_list);
+		return (-1);
 	}
-
+	if ((check_out = check_reminder(list_open, start_list, line)) != 2)
+		return (check_out);
 	while (ft_strchr(list_open->buf, '\n') == NULL)
 	{
-		if (get_read = read(fd, list_open->buf, BUFFER_SIZE) == -1)
+		if ((list_open->eof_flag = read(fd, list_open->buf, BUFFER_SIZE)) == -1)
 		{
-			// чистка
-			return (-1); // an error happened
+			delete_list(list_open, start_list);
+			return (-1);
 		}
-		if (temp = ft_strchr(list_open->buf, '\n') != NULL)
+		if (list_open->eof_flag == 0) // EOF has been reached
+		{
+			if (*list_open->buf == '\0')
+			{
+				free(*line);
+				*line = NULL;
+			}
+			delete_list(list_open, start_list);
+			return (0);
+		}
+		if ((temp = ft_strchr(list_open->buf, '\n')) != NULL)
 		{
 			*temp = '\0';
+			free(list_open->reminfer);
 			if (!(list_open->reminfer = ft_substr_gnl(temp + 1)))
 			{
-				// чистка
+				delete_list(list_open, start_list);
 				return (-1);
 			}
 			temp = *line;
 			if (!(*line = ft_strjoin_gnl(temp, list_open->buf)))
 			{
-				// чистка
+				delete_list(list_open, start_list);
 				return (-1);
 			}
-			// чистка temp и list_open->buf и остального
+			free(temp);
+			free(list_open->buf);
+			list_open->buf = NULL;
+			// delete_list(list_open, start_list);
 			return (1);
 		}
-		if (get_read == 0) // EOF has been reached
+		temp = *line;
+		if (!(*line = ft_strjoin_gnl(temp, list_open->buf)))
 		{
-			temp = *line;
-			if (!(*line = ft_strjoin_gnl(temp, list_open->buf)))
-			{
-				// чистка
-				return (-1);
-			}
-			// чистка temp и list_open->buf и остального
-			return (1);
+			delete_list(list_open, start_list);
+			return (-1);
 		}
+		free(temp);
+		// free(list_open->buf);
+		// list_open->buf = NULL;
+		temp = NULL;
 	}
-
+	return (-1);
 }
