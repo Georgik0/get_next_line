@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: skitsch <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/27 17:26:13 by skitsch           #+#    #+#             */
-/*   Updated: 2020/11/27 17:26:51 by skitsch          ###   ########.fr       */
+/*   Created: 2020/12/13 19:48:22 by skitsch           #+#    #+#             */
+/*   Updated: 2020/12/13 19:48:24 by skitsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 t_list	*search_fd(t_list **start, int descriptor)
 {
@@ -54,7 +54,6 @@ int		get_next_line(int fd, char **line)
 	char				*temp;
 	int					check_out;
 	int					i;
-	// int					get_read;
 
 	i = 0;
 	if (!line || fd < 0 || BUFFER_SIZE <= 0)

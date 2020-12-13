@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.h                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: skitsch <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/27 17:22:52 by skitsch           #+#    #+#             */
-/*   Updated: 2020/11/27 17:25:56 by skitsch          ###   ########.fr       */
+/*   Created: 2020/12/13 19:49:16 by skitsch           #+#    #+#             */
+/*   Updated: 2020/12/13 19:49:18 by skitsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#ifndef GET_NEXT_LINE_BONUS_H
+# define GET_NEXT_LINE_BONUS_H
 # include <stdlib.h>
 # include <unistd.h>
 
@@ -22,7 +22,6 @@ typedef struct		s_list
 	int				eof_flag;
 	int				check;
 	char			*reminfer;
-	// char			*temp_list;
 	void			*next;
 
 }					t_list;

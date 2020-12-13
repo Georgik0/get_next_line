@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: skitsch <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/09 20:58:17 by skitsch           #+#    #+#             */
-/*   Updated: 2020/12/09 20:58:20 by skitsch          ###   ########.fr       */
+/*   Created: 2020/12/13 19:51:38 by skitsch           #+#    #+#             */
+/*   Updated: 2020/12/13 19:51:40 by skitsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 size_t		ft_strlcpy(char *dst, const char *src, size_t size)
 {
@@ -19,7 +19,7 @@ size_t		ft_strlcpy(char *dst, const char *src, size_t size)
 
 	i = 0;
 	src_size = 0;
-	if ((!dst && !src))// || (!src && (src = ft_calloc(1, 1)) == NULL))
+	if ((!dst && !src))
 		return (0);
 	while (src[src_size] != '\0')
 		src_size++;
