@@ -12,8 +12,10 @@
 
 #include "get_next_line_bonus.h"
 
-t_list	*search_fd(t_list **start, int descriptor)
+t_list	*search_fd(t_list **start, int descriptor, t_list *list_open)
 {
+	t_list *begin;
+
 	if (!(*start))
 	{
 		if (!(*start = (t_list *)malloc(sizeof(t_list))))
@@ -28,29 +30,35 @@ t_list	*search_fd(t_list **start, int descriptor)
 		(*start)->eof_flag = 1;
 		return ((*start));
 	}
-	while (descriptor != (*start)->descriptor)
+	begin = *start;
+	while (descriptor != begin->descriptor)
 	{
-		if (((*start) = (*start)->next) == NULL)
+		if ((begin->next) == NULL)
 		{
-			if (!((*start) = (t_list *)malloc(sizeof(t_list))))
+			if (!(list_open = (t_list *)malloc(sizeof(t_list))))
 				return (NULL);
-			(*start)->next = NULL;
-			(*start)->descriptor = descriptor;
-			if (!((*start)->reminfer = ft_calloc(1, 1)))
+			begin->next = list_open;
+			list_open->descriptor = descriptor;
+			if (!(list_open->reminfer = ft_calloc(1, 1)))
+			{
+				free(begin);
 				return (NULL);
-			(*start)->eof_flag = 1;
-			return ((*start));
+			}
+			list_open->eof_flag = 1;
+			list_open->next = NULL;
+			return (list_open);
 		}
-		if ((*start)->descriptor == descriptor)
-			return ((*start));
+		begin = begin->next;
+		// if ((*start)->descriptor == descriptor)
+		// 	return ((*start));
 	}
-	return ((*start));
+	return ((begin));
 }
 
 int		get_next_line(int fd, char **line)
 {
 	static t_list		*start_list;
-	t_list				*list_open;
+	t_list				*list_open = NULL;
 	char				*temp;
 	int					check_out;
 	int					i;
@@ -60,13 +68,13 @@ int		get_next_line(int fd, char **line)
 		return (-1);
 	if (start_list == NULL) // значит лист пуст, нужно создать первый элемент
 	{
-		if (!(start_list = search_fd(&start_list, fd)))
+		if (!(start_list = search_fd(&start_list, fd, list_open)))
 			return (-1);
 		list_open = start_list;
 	}
 	else // значит что-то уже читается => можно искать необходимый элемент листа
 	{
-		if (!(list_open = search_fd(&start_list, fd)))
+		if (!(list_open = search_fd(&start_list, fd, list_open)))
 			return (-1);
 	}
 	if (!(list_open->buf = (char *)ft_calloc(1 + BUFFER_SIZE, sizeof(char))))

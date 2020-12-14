@@ -126,24 +126,26 @@ char		*ft_strjoin_gnl(char *s1, char *s2)
 void	delete_list(t_list **list_open, t_list **start_list)
 {
 	t_list	*temp;
+	t_list	*out;
 
-	if (*start_list != *list_open)
+	temp = *start_list;
+	if (temp != *list_open)
 	{
-		while (*start_list != *list_open)
-			*start_list = (*start_list)->next;
-		temp = (*start_list)->next;
-		(*start_list)->next = temp->next;
+		while (temp->next != *list_open)
+			temp = temp->next;
+		out = temp->next;
+		temp->next = out->next;
 	}
 	else
 	{
-		temp = *start_list;
+		out = *start_list;
 		*start_list = NULL;
 	}
-	free(temp->buf);
-	free(temp->reminfer);
-	free(temp->next);
-	free(temp);
-	temp = NULL;
+	free(out->buf);
+	free(out->reminfer);
+	free(out->next);
+	free(out);
+	out = NULL;
 }
 
 int		check_reminder(t_list **list_open, t_list **start_list, char **line)
