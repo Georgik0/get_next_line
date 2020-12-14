@@ -33,7 +33,7 @@ size_t		ft_strlcpy(char *dst, const char *src, size_t size);
 char		*ft_strchr(const char *str, int ch);
 char		*ft_calloc(size_t count, size_t size);
 char		*ft_substr_gnl(char *buf);
-void		delete_list(t_list **list_open, t_list **start_list);
+void		delete_list(t_list *list_open, t_list **start_list);
 int			check_reminder(t_list **list_open, t_list **start_list, char **line);
 
 #endif

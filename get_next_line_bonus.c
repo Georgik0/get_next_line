@@ -12,9 +12,10 @@
 
 #include "get_next_line_bonus.h"
 
-t_list	*search_fd(t_list **start, int descriptor, t_list *list_open)
+t_list	*search_fd(t_list **start, int descriptor)
 {
-	t_list *begin;
+	t_list *tmp;
+	t_list *list_open;
 
 	if (!(*start))
 	{
@@ -30,35 +31,35 @@ t_list	*search_fd(t_list **start, int descriptor, t_list *list_open)
 		(*start)->eof_flag = 1;
 		return ((*start));
 	}
-	begin = *start;
-	while (descriptor != begin->descriptor)
+	tmp = *start;
+	while (descriptor != tmp->descriptor)
 	{
-		if ((begin->next) == NULL)
+		if ((tmp->next) == NULL)
 		{
 			if (!(list_open = (t_list *)malloc(sizeof(t_list))))
 				return (NULL);
-			begin->next = list_open;
+			tmp->next = list_open;
 			list_open->descriptor = descriptor;
 			if (!(list_open->reminfer = ft_calloc(1, 1)))
 			{
-				free(begin);
+				free(tmp);
 				return (NULL);
 			}
 			list_open->eof_flag = 1;
 			list_open->next = NULL;
 			return (list_open);
 		}
-		begin = begin->next;
+		tmp = tmp->next;
 		// if ((*start)->descriptor == descriptor)
 		// 	return ((*start));
 	}
-	return ((begin));
+	return ((tmp));
 }
 
 int		get_next_line(int fd, char **line)
 {
 	static t_list		*start_list;
-	t_list				*list_open = NULL;
+	t_list				*list_open;
 	char				*temp;
 	int					check_out;
 	int					i;
@@ -68,23 +69,23 @@ int		get_next_line(int fd, char **line)
 		return (-1);
 	if (start_list == NULL) // значит лист пуст, нужно создать первый элемент
 	{
-		if (!(start_list = search_fd(&start_list, fd, list_open)))
+		if (!(list_open = search_fd(&start_list, fd)))
 			return (-1);
-		list_open = start_list;
+		// list_open = start_list;
 	}
 	else // значит что-то уже читается => можно искать необходимый элемент листа
 	{
-		if (!(list_open = search_fd(&start_list, fd, list_open)))
+		if (!(list_open = search_fd(&start_list, fd)))
 			return (-1);
 	}
 	if (!(list_open->buf = (char *)ft_calloc(1 + BUFFER_SIZE, sizeof(char))))
 	{
-		delete_list(&list_open, &start_list);
+		delete_list(list_open, &start_list);
 		return (-1);
 	}
 	if (!(*line = ft_calloc(1, 1)))
 	{
-		delete_list(&list_open, &start_list);
+		delete_list(list_open, &start_list);
 		return (-1);
 	}
 	if ((check_out = check_reminder(&list_open, &start_list, line)) != 2)
@@ -96,7 +97,7 @@ int		get_next_line(int fd, char **line)
 			list_open->buf[i++] = '\0';
 		if (read(fd, list_open->buf, BUFFER_SIZE) == -1)
 		{
-			delete_list(&list_open, &start_list);
+			delete_list(list_open, &start_list);
 			return (-1);
 		}
 		if ((temp = ft_strchr(list_open->buf, '\0')) != (list_open->buf + BUFFER_SIZE))
@@ -107,13 +108,13 @@ int		get_next_line(int fd, char **line)
 			free(list_open->reminfer);
 			if (!(list_open->reminfer = ft_substr_gnl(temp + 1)))
 			{
-				delete_list(&list_open, &start_list);
+				delete_list(list_open, &start_list);
 				return (-1);
 			}
 			temp = *line;
 			if (!(*line = ft_strjoin_gnl(temp, list_open->buf)))
 			{
-				delete_list(&list_open, &start_list);
+				delete_list(list_open, &start_list);
 				return (-1);
 			}
 			free(temp);
@@ -124,14 +125,14 @@ int		get_next_line(int fd, char **line)
 		temp = *line;
 		if (!(*line = ft_strjoin_gnl(temp, list_open->buf)))
 		{
-			delete_list(&list_open, &start_list);
+			delete_list(list_open, &start_list);
 			return (-1);
 		}
 		free(temp);
 		temp = NULL;
 		if (list_open->eof_flag == 0)
 		{
-			delete_list(&list_open, &start_list);
+			delete_list(list_open, &start_list);
 			return(0);
 		}
 	}

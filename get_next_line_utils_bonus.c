@@ -123,15 +123,26 @@ char		*ft_strjoin_gnl(char *s1, char *s2)
 	return (out);
 }
 
-void	delete_list(t_list **list_open, t_list **start_list)
+void	delete_list(t_list *list_open, t_list **start_list)
 {
 	t_list	*temp;
 	t_list	*out;
 
 	temp = *start_list;
-	if (temp != *list_open)
+	// if (!*start_list)
+	// 	return ;
+	// while (temp && temp->next)
+	// {
+	// 	if (temp->next == list_open)
+	// 	{
+	// 		out = temp->next;
+	// 		temp->next = out->next;
+	// 	}
+	// 	temp = temp->next;
+	// }
+	if (temp != list_open)
 	{
-		while (temp->next != *list_open)
+		while (temp && temp->next != list_open)
 			temp = temp->next;
 		out = temp->next;
 		temp->next = out->next;
@@ -143,7 +154,7 @@ void	delete_list(t_list **list_open, t_list **start_list)
 	}
 	free(out->buf);
 	free(out->reminfer);
-	free(out->next);
+	// free(out->next);
 	free(out);
 	out = NULL;
 }
@@ -159,14 +170,14 @@ int		check_reminder(t_list **list_open, t_list **start_list, char **line)
 		save = *line;
 		if (!(*line = ft_strjoin_gnl(save, (*list_open)->reminfer)))
 		{
-			delete_list(list_open, start_list);
+			delete_list(*list_open, start_list);
 			return (-1);
 		}
 		free(save);
 		save = (*list_open)->reminfer;
 		if (!((*list_open)->reminfer = ft_substr_gnl(temp + 1)))
 		{
-			delete_list(list_open, start_list);
+			delete_list(*list_open, start_list);
 			return (-1);
 		}
 		free(save);
@@ -178,14 +189,14 @@ int		check_reminder(t_list **list_open, t_list **start_list, char **line)
 	temp = *line;
 	if (!(*line = ft_strjoin_gnl(temp, (*list_open)->reminfer)))
 	{
-		delete_list(list_open, start_list);
+		delete_list(*list_open, start_list);
 		return (-1);
 	}
 	free(temp);
 	temp = NULL;
 	if ((*list_open)->eof_flag == 0)
 	{
-		delete_list(list_open, start_list);
+		delete_list(*list_open, start_list);
 		return (0);
 	}
 	return (2); // нужно читать дальше
