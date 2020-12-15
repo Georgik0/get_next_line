@@ -99,17 +99,11 @@ char		*ft_strjoin_gnl(char *s1, char *s2)
 	int		size2;
 
 	size2 = 0;
-	if (s2)
-	{
-		while (s2[size2] != '\0')
-			size2++;
-	}
+	while (s2[size2] != '\0')
+		size2++;
 	size1 = 0;
-	if (s1)
-	{
-		while (s1[size1] != '\0')
-			size1++;
-	}
+	while (s1[size1] != '\0')
+		size1++;
 	if (!(out = (char *)ft_calloc(size1 + size2 + 1, sizeof(char))))
 		return (NULL);
 	out[size2 + size1] = '\0';
@@ -129,17 +123,6 @@ void	delete_list(t_list *list_open, t_list **start_list)
 	t_list	*out;
 
 	temp = *start_list;
-	// if (!*start_list)
-	// 	return ;
-	// while (temp && temp->next)
-	// {
-	// 	if (temp->next == list_open)
-	// 	{
-	// 		out = temp->next;
-	// 		temp->next = out->next;
-	// 	}
-	// 	temp = temp->next;
-	// }
 	if (temp != list_open)
 	{
 		while (temp && temp->next != list_open)
@@ -150,11 +133,10 @@ void	delete_list(t_list *list_open, t_list **start_list)
 	else
 	{
 		out = *start_list;
-		*start_list = NULL;
+		*start_list = out->next;
 	}
 	free(out->buf);
 	free(out->reminfer);
-	// free(out->next);
 	free(out);
 	out = NULL;
 }
@@ -184,7 +166,7 @@ int		check_reminder(t_list **list_open, t_list **start_list, char **line)
 		save = NULL;
 		free((*list_open)->buf);
 		(*list_open)->buf = NULL;
-		return (1); // a line has been read
+		return (1);
 	}
 	temp = *line;
 	if (!(*line = ft_strjoin_gnl(temp, (*list_open)->reminfer)))
@@ -199,5 +181,5 @@ int		check_reminder(t_list **list_open, t_list **start_list, char **line)
 		delete_list(*list_open, start_list);
 		return (0);
 	}
-	return (2); // нужно читать дальше
+	return (2);
 }

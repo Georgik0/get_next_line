@@ -15,7 +15,6 @@
 t_list	*search_fd(t_list **start, int descriptor)
 {
 	t_list *tmp;
-	t_list *list_open;
 
 	if (!(*start))
 	{
@@ -36,22 +35,19 @@ t_list	*search_fd(t_list **start, int descriptor)
 	{
 		if ((tmp->next) == NULL)
 		{
-			if (!(list_open = (t_list *)malloc(sizeof(t_list))))
+			if (!(tmp->next = (t_list *)malloc(sizeof(t_list))))
 				return (NULL);
-			tmp->next = list_open;
-			list_open->descriptor = descriptor;
-			if (!(list_open->reminfer = ft_calloc(1, 1)))
+			tmp->next->descriptor = descriptor;
+			if (!(tmp->next->reminfer = ft_calloc(1, 1)))
 			{
-				free(tmp);
+				free(tmp->next);
 				return (NULL);
 			}
-			list_open->eof_flag = 1;
-			list_open->next = NULL;
-			return (list_open);
+			tmp->next->eof_flag = 1;
+			tmp->next->next = NULL;
+			return (tmp->next);
 		}
 		tmp = tmp->next;
-		// if ((*start)->descriptor == descriptor)
-		// 	return ((*start));
 	}
 	return ((tmp));
 }
@@ -64,20 +60,10 @@ int		get_next_line(int fd, char **line)
 	int					check_out;
 	int					i;
 
-	i = 0;
 	if (!line || fd < 0 || BUFFER_SIZE <= 0)
 		return (-1);
-	if (start_list == NULL) // значит лист пуст, нужно создать первый элемент
-	{
-		if (!(list_open = search_fd(&start_list, fd)))
-			return (-1);
-		// list_open = start_list;
-	}
-	else // значит что-то уже читается => можно искать необходимый элемент листа
-	{
-		if (!(list_open = search_fd(&start_list, fd)))
-			return (-1);
-	}
+	if (!(list_open = search_fd(&start_list, fd)))
+		return (-1);
 	if (!(list_open->buf = (char *)ft_calloc(1 + BUFFER_SIZE, sizeof(char))))
 	{
 		delete_list(list_open, &start_list);
@@ -95,13 +81,11 @@ int		get_next_line(int fd, char **line)
 		i = 0;
 		while (list_open->buf[i] != '\0')
 			list_open->buf[i++] = '\0';
-		if (read(fd, list_open->buf, BUFFER_SIZE) == -1)
+		if ((list_open->eof_flag = read(fd, list_open->buf, BUFFER_SIZE)) == -1)
 		{
 			delete_list(list_open, &start_list);
 			return (-1);
 		}
-		if ((temp = ft_strchr(list_open->buf, '\0')) != (list_open->buf + BUFFER_SIZE))
-			list_open->eof_flag = 0;
 		if ((temp = ft_strchr(list_open->buf, '\n')) != NULL)
 		{
 			*temp = '\0';

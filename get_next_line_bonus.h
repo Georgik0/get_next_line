@@ -20,9 +20,8 @@ typedef struct		s_list
 	int				descriptor;
 	char			*buf;
 	int				eof_flag;
-	int				check;
 	char			*reminfer;
-	void			*next;
+	struct s_list	*next;
 
 }					t_list;
 
