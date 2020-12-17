@@ -60,15 +60,15 @@ t_list	*search_fd(t_list **start, int descriptor)
 	return ((tmp));
 }
 
-int		delete_list(t_list *list_open, t_list **start_list)
+int		delete_list(t_list *lop, t_list **start_list)
 {
 	t_list	*temp;
 	t_list	*out;
 
 	temp = *start_list;
-	if (temp != list_open)
+	if (temp != lop)
 	{
-		while (temp && temp->next != list_open)
+		while (temp && temp->next != lop)
 			temp = temp->next;
 		out = temp->next;
 		temp->next = out->next;
@@ -85,55 +85,58 @@ int		delete_list(t_list *list_open, t_list **start_list)
 	return (0);
 }
 
-int		get_next_line1(t_list **list_open, t_list **start_list, char **line, char *temp)
+int		get_next_line1(t_list **lop, t_list **start_list,
+		char **line, char *temp)
 {
-	if (((*list_open)->eof_flag = read((*list_open)->descriptor, (*list_open)->buf, BUFFER_SIZE)) == -1)
-		return (delete_list(*list_open, start_list) - 1);
-	if ((temp = ft_strchr((*list_open)->buf, '\n')) != NULL)
+	if (((*lop)->eof_flag = read((*lop)->descriptor,
+	(*lop)->buf, BUFFER_SIZE)) == -1)
+		return (delete_list(*lop, start_list) - 1);
+	if ((temp = ft_strchr((*lop)->buf, '\n')) != NULL)
 	{
 		*temp = '\0';
-		free((*list_open)->reminfer);
-		if (!((*list_open)->reminfer = ft_strjoin_gnl(temp + 1, NULL, *list_open, start_list)))
+		free((*lop)->reminfer);
+		if (!((*lop)->reminfer = fsjoin(temp + 1, NULL, *lop, start_list)))
 			return (-1);
 		temp = *line;
-		if (!(*line = ft_strjoin_gnl(temp, (*list_open)->buf, *list_open, start_list)))
+		if (!(*line = fsjoin(temp, (*lop)->buf, *lop, start_list)))
 			return (-1);
 		free(temp);
-		free((*list_open)->buf);
-		(*list_open)->buf = NULL;
+		free((*lop)->buf);
+		(*lop)->buf = NULL;
 		return (1);
 	}
 	temp = *line;
-	if (!(*line = ft_strjoin_gnl(temp, (*list_open)->buf, *list_open, start_list)))
+	if (!(*line = fsjoin(temp, (*lop)->buf, *lop, start_list)))
 		return (-1);
 	free(temp);
-	if ((*list_open)->eof_flag == 0)
-		return(delete_list(*list_open, start_list));
+	if ((*lop)->eof_flag == 0)
+		return (delete_list(*lop, start_list));
 	return (2);
 }
 
 int		get_next_line(int fd, char **line)
 {
 	static t_list		*start_list;
-	t_list				*list_open;
+	t_list				*lop;
 	char				*temp;
 	int					out;
 
 	if (!line || fd < 0 || BUFFER_SIZE <= 0)
 		return (-1);
-	if (!(list_open = search_fd(&start_list, fd)))
+	if (!(lop = search_fd(&start_list, fd)))
 		return (-1);
-	if (!(list_open->buf = (char *)ft_calloc(1 + BUFFER_SIZE, sizeof(char))) ||
+	if (!(lop->buf = (char *)ft_calloc(1 + BUFFER_SIZE, sizeof(char))) ||
 	!(*line = ft_calloc(1, 1)))
-		return (delete_list(list_open, &start_list) - 1);
-	if ((list_open->check_out = check_reminder(&list_open, &start_list, line, temp = NULL)) != 2)
-		return (list_open->check_out);
-	while (ft_strchr(list_open->buf, '\n') == NULL)
+		return (delete_list(lop, &start_list) - 1);
+	temp = NULL;
+	if ((lop->check_out = check_reminder(&lop, &start_list, line, temp)) != 2)
+		return (lop->check_out);
+	while (ft_strchr(lop->buf, '\n') == NULL)
 	{
-		list_open->i = 0;
-		while (list_open->buf[list_open->i] != '\0')
-			list_open->buf[list_open->i++] = '\0';
-		if ((out = get_next_line1(&list_open, &start_list, line, temp)) != 2)
+		lop->i = 0;
+		while (lop->buf[lop->i] != '\0')
+			lop->buf[lop->i++] = '\0';
+		if ((out = get_next_line1(&lop, &start_list, line, temp)) != 2)
 			return (out);
 	}
 	return (-1);

@@ -35,7 +35,7 @@ size_t		ft_strlcpy(char *dst, const char *src, size_t size)
 	return (src_size);
 }
 
-char	*ft_strchr(const char *str, int ch)
+char		*ft_strchr(const char *str, int ch)
 {
 	int i;
 
@@ -51,7 +51,7 @@ char	*ft_strchr(const char *str, int ch)
 	return (NULL);
 }
 
-char	*ft_calloc(size_t count, size_t size)
+char		*ft_calloc(size_t count, size_t size)
 {
 	char		*out;
 	size_t		i;
@@ -67,7 +67,8 @@ char	*ft_calloc(size_t count, size_t size)
 	return (out);
 }
 
-char		*ft_strjoin_gnl(char *s1, char *s2, t_list *list_open, t_list **start_list)
+char		*fsjoin(char *s1, char *s2, t_list *lop,
+			t_list **start_list)
 {
 	char	*out;
 	int		size1;
@@ -81,7 +82,7 @@ char		*ft_strjoin_gnl(char *s1, char *s2, t_list *list_open, t_list **start_list
 		size1++;
 	if (!(out = (char *)ft_calloc(size1 + size2 + 1, sizeof(char))))
 	{
-		delete_list(list_open, start_list);
+		delete_list(lop, start_list);
 		return (NULL);
 	}
 	out[size2 + size1] = '\0';
@@ -95,30 +96,32 @@ char		*ft_strjoin_gnl(char *s1, char *s2, t_list *list_open, t_list **start_list
 	return (out);
 }
 
-int		check_reminder(t_list **list_open, t_list **start_list, char **line, char *temp)
+int			check_reminder(t_list **lop, t_list **start_list, char **line,
+			char *temp)
 {
 	char	*save;
 
-	if ((temp = ft_strchr((*list_open)->reminfer, '\n')) != NULL)
+	if ((temp = ft_strchr((*lop)->reminfer, '\n')) != NULL)
 	{
 		*temp = '\0';
 		save = *line;
-		if (!(*line = ft_strjoin_gnl(save, (*list_open)->reminfer, *list_open, start_list)))
+		if (!(*line = fsjoin(save, (*lop)->reminfer,
+		*lop, start_list)))
 			return (-1);
 		free(save);
-		save = (*list_open)->reminfer;
-		if (!((*list_open)->reminfer = ft_strjoin_gnl(temp + 1, NULL, *list_open, start_list)))
+		save = (*lop)->reminfer;
+		if (!((*lop)->reminfer = fsjoin(temp + 1, NULL, *lop, start_list)))
 			return (-1);
 		free(save);
-		free((*list_open)->buf);
-		(*list_open)->buf = NULL;
+		free((*lop)->buf);
+		(*lop)->buf = NULL;
 		return (1);
 	}
 	temp = *line;
-	if (!(*line = ft_strjoin_gnl(temp, (*list_open)->reminfer, *list_open, start_list)))
+	if (!(*line = fsjoin(temp, (*lop)->reminfer, *lop, start_list)))
 		return (-1);
 	free(temp);
-	if ((*list_open)->eof_flag == 0)
-		return (delete_list(*list_open, start_list));
+	if ((*lop)->eof_flag == 0)
+		return (delete_list(*lop, start_list));
 	return (2);
 }

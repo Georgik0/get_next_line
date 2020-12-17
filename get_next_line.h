@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: skitsch <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/27 17:22:52 by skitsch           #+#    #+#             */
-/*   Updated: 2020/11/27 17:25:56 by skitsch          ###   ########.fr       */
+/*   Created: 2020/12/15 21:17:52 by skitsch           #+#    #+#             */
+/*   Updated: 2020/12/15 21:18:05 by skitsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,21 +20,23 @@ typedef struct		s_list
 	int				descriptor;
 	char			*buf;
 	int				eof_flag;
-	int				check;
 	char			*reminfer;
-	// char			*temp_list;
-	void			*next;
+	int				check_out;
+	int				i;
+	struct s_list	*next;
 
 }					t_list;
 
-
-int			get_next_line(int fd, char **line);
-char		*ft_strjoin_gnl(char *s1, char *s2);
-size_t		ft_strlcpy(char *dst, const char *src, size_t size);
-char		*ft_strchr(const char *str, int ch);
-char		*ft_calloc(size_t count, size_t size);
-char		*ft_substr_gnl(char *buf);
-void		delete_list(t_list **list_open, t_list **start_list);
-int			check_reminder(t_list **list_open, t_list **start_list, char **line);
+int					get_next_line(int fd, char **line);
+char				*fsjoin(char *s1, char *s2, t_list *list_open,
+					t_list **start_list);
+size_t				ft_strlcpy(char *dst, const char *src, size_t size);
+char				*ft_strchr(const char *str, int ch);
+char				*ft_calloc(size_t count, size_t size);
+char				*ft_substr_gnl(char *buf, t_list *list_open,
+					t_list **start_list);
+int					delete_list(t_list *list_open, t_list **start_list);
+int					check_reminder(t_list **list_open, t_list **start_list,
+					char **line, char *temp);
 
 #endif
